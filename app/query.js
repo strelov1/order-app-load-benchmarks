@@ -8,7 +8,7 @@ export const createOrder2 = async ({ userId, products }, connect) => {
 
     try {
         const productIds = products.map(p => p.productId);
-        const result = await connect.query(`SELECT id, inventory FROM products WHERE id IN (${productIds.join(', ')}) FOR UPDATE`);
+        const result = await connect.query(`SELECT id, inventory FROM products WHERE id IN (${productIds.join(', ')})`);
         const inventoryMap = new Map(result.rows.map(row => [row.id, row.inventory]));
 
         for (const item of products) {

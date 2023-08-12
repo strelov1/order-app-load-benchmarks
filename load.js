@@ -2,7 +2,7 @@ import http from 'k6/http';
 
 export let options = {
     vus: 200,
-    duration: '2m',
+    duration: '1m',
 };
 
 function getRandomInt(min, max) {

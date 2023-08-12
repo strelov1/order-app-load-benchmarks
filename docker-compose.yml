@@ -10,6 +10,7 @@ services:
     command: ["/bin/sh", "-c", "/wait-for-it.sh postgres:5432 --timeout=90 -- npm run start"]
     ports:
       - "3000:3000"
+      - "3001:3001"
     environment:
       DATABASE_URL: "postgresql://postgres:password@postgres:5432/store"
     depends_on:
@@ -25,25 +26,25 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./script:/docker-entrypoint-initdb.d
 
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus:/etc/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - "9090:9090"
+  # prometheus:
+  #   image: prom/prometheus
+  #   volumes:
+  #     - ./prometheus:/etc/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #   ports:
+  #     - "9090:9090"
 
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "3001:3000"
-    volumes:
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
-    depends_on:
-      - prometheus
+  # grafana:
+  #   image: grafana/grafana
+  #   ports:
+  #     - "3001:3000"
+  #   volumes:
+  #     - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+  #     - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+  #     - ./grafana/dashboards:/var/lib/grafana/dashboards
+  #   depends_on:
+  #     - prometheus
 
 volumes:
   pgdata:

@@ -1,6 +1,5 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import promClient from 'prom-client';
 
 export function createApp(appName, handlers) {
     const app = express();
@@ -48,10 +47,7 @@ export function createApp(appName, handlers) {
     //     }
     // });
 
-    app.get('/metrics', async (req, res) => {
-        res.set('Content-Type', promClient.register.contentType);
-        res.end(await promClient.register.metrics());
-    });
+    app.get('/metrics', handlers.metricsHanlder);
 
     const port = 3000;
     app.listen(port, () => {

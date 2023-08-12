@@ -1,4 +1,7 @@
+import express from 'express';
 import promClient from 'prom-client';
+
+const aggregatorRegistry = new promClient.AggregatorRegistry();
 
 // rate(request_total[1m])
 export const httpRequest = new promClient.Counter({
@@ -21,3 +24,14 @@ export const failedOrdersCounter = new promClient.Counter({
     name: 'failed_orders_total',
     help: 'Total number of failed orders',
 });
+
+export const metricSererver = () => {
+    const metricsServer = express();
+    metricsServer.get('/metrics', (req, res) => {
+        aggregatorRegistry.clusterMetrics().then((metrics) => {
+            res.set('Content-Type', aggregatorRegistry.contentType);
+            res.send(metrics);
+        });
+    });
+    metricsServer.listen(3001); 
+}

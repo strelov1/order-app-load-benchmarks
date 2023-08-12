@@ -1,4 +1,5 @@
 import pg from 'pg'
+import promClient from 'prom-client';
 import { createApp } from './app.js';
 import { getProducts, createOrder1 as createOrder } from './query.js';
 import { httpRequest, httpFailedRequest, successfulOrdersCounter, failedOrdersCounter } from './metrics.js';
@@ -48,7 +49,18 @@ const createOrderHandler = async (req, res) => {
   }
 }
 
+const metricsHanlder = async (req, res) => {
+  try {
+    res.set('Content-Type', promClient.register.contentType);
+    res.end(await promClient.register.metrics());
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal server error");
+  }
+};
+
 createApp('app-2', { 
   listProductHandler,
-  createOrderHandler
+  createOrderHandler,
+  metricsHanlder
 });

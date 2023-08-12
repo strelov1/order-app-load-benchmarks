@@ -1,7 +1,7 @@
 import pg from 'pg'
 import promClient from 'prom-client';
 import { createApp } from './app.js';
-import { getProducts, createOrder1 as createOrder } from './query.js';
+import { getProducts2 as getProducts, createOrder2 as createOrder } from './query.js';
 import { httpRequest, httpFailedRequest, successfulOrdersCounter, failedOrdersCounter } from './metrics.js';
 
 

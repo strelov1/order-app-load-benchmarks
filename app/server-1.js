@@ -13,10 +13,7 @@ await client.connect();
 const listProductHandler = async (req, res) => {
   httpRequest.inc();
   try {
-      const limit = 100;
-      const page = parseInt(req.query.page, 10) || 1;
-      const offset = (page - 1) * limit;
-      const products = await getProducts(client, limit, offset);
+      const products = await getProducts(client, req.query.page);
       res.json(products);
   } catch (error) {
       console.error("Error fetching products:", error);

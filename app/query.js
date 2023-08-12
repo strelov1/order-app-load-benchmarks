@@ -1,5 +1,41 @@
-export const getProducts = async (connect, limit = 100, offset = 0) => {
+export const getProducts = async (connect, pageInput) => {
+    const limit = 100;
+    const page = parseInt(pageInput, 10) || 1;
+    const offset = (page - 1) * limit;
+
     const result = await connect.query(`SELECT * FROM products WHERE inventory > 0 ORDER BY id ASC LIMIT $1 OFFSET $2`, [limit, offset]);
+    return result.rows;
+}
+
+let pageCache = null;
+let lastRowId = null
+
+export const getProducts2 = async (connect, pageInput) => {
+    const limit = 100;
+    const page = parseInt(pageInput, 10) || 1;
+
+    if (pageCache) {
+        let offsetRow;
+        if (page > pageCache) {
+            const rowsToSkip = limit * (page - pageCache - 1);
+            offsetRow = lastRowId + 1 + rowsToSkip;
+        } else if (page < pageCache) {
+            const rowsToSkip = limit * (pageCache - page + 1);
+            offsetRow = lastRowId - rowsToSkip;
+        } else {
+            offsetRow = lastRowId - limit + 1;
+        }
+        const result = await connect.query(`SELECT id, name, description, price, inventory FROM products WHERE inventory > 0 AND id >= $1 ORDER BY id ASC LIMIT $2`, [offsetRow, limit]);
+        pageCache = page
+        lastRowId = result.rows[result.rows.length-1].id;
+        return result.rows;
+    }
+
+    const offset = (page - 1) * limit;
+    const result = await connect.query(`SELECT id, name, description, price, inventory FROM products WHERE inventory > 0 ORDER BY id ASC LIMIT $1 OFFSET $2`, [limit, offset]);
+    pageCache = page
+    lastRowId = result.rows[result.rows.length-1].id;
+
     return result.rows;
 }
 

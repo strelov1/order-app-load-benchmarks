@@ -59,12 +59,20 @@ export const createOrder2 = async ({ userId, products }, connect) => {
         await connect.query(`UPDATE products SET inventory = CASE ${updateCases} END WHERE id = ANY($1::int[])`, [productIds]);
         
         // Create an order record
-        const orderResult = await connect.query('INSERT INTO orders(user_id) VALUES ($1) RETURNING id', [userId]);
-        const orderId = orderResult.rows[0].id;
+        // const orderResult = await connect.query('INSERT INTO orders(user_id) VALUES ($1) RETURNING id', [userId]);
+        // const orderId = orderResult.rows[0].id;
     
         // Link products to the order
-        const orderItemsValues = products.map(p => `(${orderId}, ${p.productId}, ${p.quantity}, ${p.price})`).join(', ');
-        await connect.query(`INSERT INTO order_items(order_id, product_id, quantity, price) VALUES ${orderItemsValues}`);
+        // const orderItemsValues = products.map(p => `(${orderId}, ${p.productId}, ${p.quantity}, ${p.price})`).join(', ');
+        // await connect.query(`INSERT INTO order_items(order_id, product_id, quantity, price) VALUES ${orderItemsValues}`);
+        
+        const orderItems = products.map(p => ({
+            product_id: p.productId,
+            quantity: p.quantity,
+            price: p.price
+        }));
+        
+        await connect.query(`INSERT INTO orders2(user_id, order_items) VALUES ($1, $2)`, [userId, JSON.stringify(orderItems)]);
         await connect.query('COMMIT');
     } catch (error) {
         await connect.query('ROLLBACK');
